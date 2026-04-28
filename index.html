@@ -1,0 +1,1490 @@
+<!--
+Fluxo de Pré-Cadastro CV CRM — Documentação Técnica
+Este projeto consiste em uma documentação interativa e visual desenvolvida para padronizar e proteger a integridade do workflow de pré-cadastro (pastas) no sistema CV CRM. O objetivo é eliminar a "bagunça" operacional, definindo limites claros de atuação para cada perfil e garantindo que a análise de crédito seja realizada de forma técnica e segura.
+
+Desenvolvedor
+Autor: Lucas Fonseca
+Cargo: Analista de Dados
+Empresa: Sell My House
+Finalidade: Governança de Processos e Eficiência Operacional
+
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Workflow - Pré-Cadastro CV CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --cor-principal: #0E4174;
+            --cor-secundaria: #EE7D19;
+            --cor-background: #FFFFFF;
+            --cor-principal-escura: #0a2f54;
+            --cor-secundaria-clara: #ff9940;
+            --cinza-claro: #f8f9fa;
+            --cinza-medio: #dee2e6;
+            --cinza-escuro: #495057;
+            --texto-principal: #212529;
+            --verde-sucesso: #28a745;
+            --vermelho-erro: #dc3545;
+            --amarelo-aviso: #ffc107;
+            --sombra: rgba(14, 65, 116, 0.08);
+            --sombra-forte: rgba(14, 65, 116, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cor-background);
+            color: var(--texto-principal);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--cor-principal) 0%, var(--cor-principal-escura) 100%);
+            color: white;
+            padding: 40px 0 20px;
+            box-shadow: 0 4px 20px var(--sombra-forte);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            padding: 20px 0 10px;
+            box-shadow: 0 2px 10px var(--sombra-forte);
+        }
+
+        header.scrolled h1 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        header.scrolled .subtitle {
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            margin-bottom: 15px;
+        }
+
+        header.scrolled .nav-tab {
+            padding: 10px 20px;
+        }
+
+        h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            opacity: 0.95;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Navegação por abas */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-top: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            scrollbar-width: thin;
+            scrollbar-color: var(--cor-secundaria) transparent;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .nav-tabs::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .nav-tabs::-webkit-scrollbar-thumb {
+            background: var(--cor-secundaria);
+            border-radius: 4px;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: var(--cor-secundaria);
+            box-shadow: 0 4px 12px rgba(238, 125, 25, 0.3);
+        }
+
+        .nav-tab i {
+            font-size: 1.1em;
+        }
+
+        /* Seções com conteúdo */
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            padding: clamp(30px, 5vw, 60px) 0;
+        }
+
+        .section-header {
+            margin-bottom: clamp(24px, 4vw, 40px);
+        }
+
+        .section-header h2 {
+            font-family: 'Sora', sans-serif;
+            color: var(--cor-principal);
+            font-size: clamp(1.5rem, 4vw, 2.25rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .section-header p {
+            color: var(--cinza-escuro);
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
+            line-height: 1.6;
+        }
+
+        /* Fluxograma BPMN/Swimlane */
+        .flowchart-container {
+            background: white;
+            border-radius: 16px;
+            padding: clamp(20px, 4vw, 40px);
+            box-shadow: 0 4px 20px var(--sombra);
+            overflow-x: auto;
+            border: 2px solid var(--cinza-medio);
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            min-height: 500px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Cards de Status */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+            gap: clamp(16px, 3vw, 24px);
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: clamp(20px, 4vw, 28px);
+            box-shadow: 0 2px 8px var(--sombra);
+            border: 2px solid var(--cinza-medio);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cor-principal), var(--cor-secundaria));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .status-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .status-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--sombra-forte);
+            border-color: var(--cor-principal);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .status-icon.inicio {
+            background: linear-gradient(135deg, var(--verde-sucesso), #218838);
+            color: white;
+        }
+
+        .status-icon.analise {
+            background: linear-gradient(135deg, var(--cor-principal), var(--cor-principal-escura));
+            color: white;
+        }
+
+        .status-icon.pendencia {
+            background: linear-gradient(135deg, var(--amarelo-aviso), #e0a800);
+            color: white;
+        }
+
+        .status-icon.aprovado {
+            background: linear-gradient(135deg, var(--verde-sucesso), #1e7e34);
+            color: white;
+        }
+
+        .status-icon.reprovado {
+            background: linear-gradient(135deg, var(--vermelho-erro), #c82333);
+            color: white;
+        }
+
+        .status-card h3 {
+            font-family: 'Sora', sans-serif;
+            color: var(--cor-principal);
+            font-size: clamp(1.15rem, 3vw, 1.35rem);
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .status-description {
+            color: var(--cinza-escuro);
+            margin-bottom: 16px;
+            line-height: 1.7;
+            font-size: clamp(0.9rem, 2vw, 0.95rem);
+        }
+
+        .status-responsible {
+            background: var(--cinza-claro);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--cor-secundaria);
+        }
+
+        .status-responsible strong {
+            color: var(--cor-principal);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: clamp(0.9rem, 2vw, 0.95rem);
+        }
+
+        .status-responsible span {
+            color: var(--texto-principal);
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+        }
+
+        .status-actions {
+            margin-top: 16px;
+        }
+
+        .status-actions h4 {
+            color: var(--cor-principal);
+            font-size: clamp(0.9rem, 2vw, 0.95rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .actions-list {
+            list-style: none;
+        }
+
+        .actions-list li {
+            padding: 6px 0;
+            color: var(--texto-principal);
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .actions-list li i {
+            color: var(--cor-secundaria);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .actions-list li strong {
+            white-space: nowrap;
+        }
+
+        /* Tabela de Matriz */
+        .matrix-container {
+            background: white;
+            border-radius: 16px;
+            padding: clamp(20px, 4vw, 32px);
+            box-shadow: 0 4px 20px var(--sombra);
+            overflow-x: auto;
+            border: 2px solid var(--cinza-medio);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            min-width: 600px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--cor-principal), var(--cor-principal-escura));
+            color: white;
+        }
+
+        th {
+            padding: clamp(12px, 2vw, 16px);
+            text-align: left;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 2vw, 0.95rem);
+        }
+
+        th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--cinza-medio);
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background-color: var(--cinza-claro);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        td {
+            padding: clamp(12px, 2vw, 16px);
+            color: var(--texto-principal);
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: var(--cor-principal);
+        }
+
+        .permission-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: clamp(0.75rem, 1.8vw, 0.85rem);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .permission-badge.full {
+            background: linear-gradient(135deg, var(--verde-sucesso), #1e7e34);
+            color: white;
+        }
+
+        .permission-badge.view {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .permission-badge.blocked {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .permission-badge.action {
+            background: #FFF3E0;
+            color: var(--cor-secundaria);
+        }
+
+        /* FAQ/Dicas */
+        .faq-container {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF3D6 100%);
+            border-radius: 16px;
+            padding: clamp(24px, 5vw, 40px);
+            box-shadow: 0 4px 20px rgba(238, 125, 25, 0.15);
+            border: 2px solid #FFD54F;
+        }
+
+        .faq-header {
+            margin-bottom: clamp(20px, 4vw, 32px);
+        }
+
+        .faq-header h2 {
+            font-family: 'Sora', sans-serif;
+            color: var(--cor-secundaria);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: clamp(16px, 3vw, 20px);
+        }
+
+        .faq-item {
+            background: white;
+            padding: clamp(18px, 4vw, 24px);
+            border-radius: 12px;
+            border-left: 4px solid var(--cor-secundaria);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .faq-item h3 {
+            color: var(--cor-secundaria);
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            line-height: 1.4;
+        }
+
+        .faq-item p {
+            color: var(--texto-principal);
+            line-height: 1.7;
+            font-size: clamp(0.9rem, 2vw, 0.95rem);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--cor-principal-escura);
+            color: white;
+            padding: clamp(24px, 4vw, 32px) 0;
+            text-align: center;
+            margin-top: clamp(40px, 6vw, 80px);
+        }
+
+        footer p {
+            opacity: 0.9;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.6;
+        }
+
+        /* Responsividade específica */
+        @media (max-width: 768px) {
+            header {
+                padding: 24px 0 16px;
+            }
+
+            header.scrolled {
+                padding: 16px 0 10px;
+            }
+
+            header.scrolled h1 {
+                font-size: 1.5rem;
+            }
+
+            header.scrolled .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 12px;
+            }
+
+            .nav-tabs {
+                gap: 4px;
+                padding: 8px 0;
+            }
+
+            .nav-tab {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+
+            header.scrolled .nav-tab {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th,
+            td {
+                padding: 10px 8px;
+            }
+
+            .permission-badge {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .nav-tab i {
+                display: none;
+            }
+
+            .status-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .status-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .status-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-project-diagram"></i> Guia de Workflow Pré-Cadastro CV CRM</h1>
+            <p class="subtitle">
+                Documentação completa sobre o fluxo de trabalho, responsabilidades e permissões no processo de
+                pré-cadastro.
+            </p>
+
+            <nav class="nav-tabs" role="tablist">
+                <button class="nav-tab active" onclick="switchTab('fluxograma')" data-tab="fluxograma">
+                    <i class="fas fa-sitemap"></i>
+                    <span>Fluxograma</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('status')" data-tab="status">
+                    <i class="fas fa-tasks"></i>
+                    <span>Status e Responsabilidades</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('matriz')" data-tab="matriz">
+                    <i class="fas fa-table"></i>
+                    <span>Matriz de Permissões</span>
+                </button>
+                <button class="nav-tab" onclick="switchTab('faq')" data-tab="faq">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>FAQ</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Seção: Fluxograma -->
+        <div id="fluxograma" class="tab-content active">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-sitemap"></i> Fluxograma do Workflow</h2>
+                    <p>Visualização em formato BPMN/Swimlane mostrando a separação de responsabilidades por perfil</p>
+                </div>
+                <div class="flowchart-container">
+                    <div class="mermaid">
+                        %%{init: {'theme':'base', 'themeVariables': {
+                        'primaryColor':'#E3F2FD','primaryTextColor':'#0E4174','primaryBorderColor':'#0E4174','lineColor':'#0E4174','secondaryColor':'#FFF3E0','tertiaryColor':'#E8F5E9','noteBkgColor':'#FFF9E6','noteTextColor':'#212529'}}}%%
+                        graph TB
+                        subgraph SG1["👤 CORRETOR / IMOBILIÁRIA / GESTOR"]
+                        A[📝 Nova Avaliação<br />Cadastro Inicial]
+                        H[⚠️ Pendência Documental<br />Corrigir Erros]
+                        I[✅ Aprovado]
+                        J[⚡ Condicionado]
+                        M[🎯 Iniciar Reserva]
+                        end
+
+                        subgraph SG2["📊 CORRESPONDENTE BANCÁRIO - CCA"]
+                        B[📋 Aguardando Correspondente<br />Transferência de Custódia]
+                        C[🔍 Análise Documental<br />Validação CV Magic]
+                        D[🏠 Análise SICAQ<br />Subsídios e Tetos]
+                        E[🏦 Aguardando Agência<br />Consulta Bancária]
+                        F[💰 Validação de Renda<br />Comprometimento]
+                        G{Decisão Final}
+                        K[❌ Restrição<br />Score Baixo]
+                        L[🚫 Reprovado<br />Renda Insuficiente]
+                        end
+
+                        subgraph SG3["⏹️ ENCERRAMENTO"]
+                        N[📂 Pasta Cancelada<br />Desistência]
+                        end
+
+                        A -->|Enviar para CCA| B
+                        B -->|Iniciar Análise| C
+                        C -->|Prosseguir| D
+                        C -->|Prosseguir| E
+                        C -->|Prosseguir| F
+                        C -->|Problema Identificado| H
+                        D --> G
+                        E --> G
+                        F --> G
+                        H -->|Corrigido| B
+                        G -->|Crédito OK| I
+                        G -->|Crédito Condicional| J
+                        G -->|Problema Crédito| K
+                        G -->|Sem Capacidade| L
+                        I --> M
+                        J --> M
+                        A -.Desistência.-> N
+                        B -.Desistência.-> N
+                        H -.Desistência.-> N
+
+                        style A fill:#28a745,stroke:#1e7e34,stroke-width:3px,color:#fff
+                        style B fill:#0E4174,stroke:#0a2f54,stroke-width:3px,color:#fff
+                        style C fill:#0E4174,stroke:#0a2f54,stroke-width:2px,color:#fff
+                        style D fill:#0E4174,stroke:#0a2f54,stroke-width:2px,color:#fff
+                        style E fill:#0E4174,stroke:#0a2f54,stroke-width:2px,color:#fff
+                        style F fill:#0E4174,stroke:#0a2f54,stroke-width:2px,color:#fff
+                        style G fill:#EE7D19,stroke:#d66d0f,stroke-width:3px,color:#fff
+                        style H fill:#ffc107,stroke:#e0a800,stroke-width:3px,color:#212529
+                        style I fill:#28a745,stroke:#1e7e34,stroke-width:3px,color:#fff
+                        style J fill:#28a745,stroke:#1e7e34,stroke-width:2px,color:#fff
+                        style K fill:#dc3545,stroke:#c82333,stroke-width:3px,color:#fff
+                        style L fill:#dc3545,stroke:#c82333,stroke-width:3px,color:#fff
+                        style M fill:#28a745,stroke:#1e7e34,stroke-width:3px,color:#fff
+                        style N fill:#6c757d,stroke:#5a6268,stroke-width:2px,color:#fff
+                        style SG1 fill:#E8F5E9,stroke:#28a745,stroke-width:2px
+                        style SG2 fill:#E3F2FD,stroke:#0E4174,stroke-width:2px
+                        style SG3 fill:#F5F5F5,stroke:#6c757d,stroke-width:2px
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Seção: Status e Responsabilidades -->
+        <div id="status" class="tab-content">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Status e Responsabilidades</h2>
+                    <p>Detalhamento de cada etapa do workflow com ações específicas por perfil</p>
+                </div>
+                <div class="status-grid">
+                    <!-- Nova Avaliação -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon inicio">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <h3>Nova Avaliação</h3>
+                        </div>
+                        <p class="status-description">
+                            Status inicial do processo. Momento de qualificação do cliente e coleta de informações
+                            fundamentais para análise de crédito.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Corretor / Imobiliária / Gestor</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-edit"></i> Edição total de cadastro e dados pessoais</li>
+                                <li><i class="fas fa-file-upload"></i> Anexar documentos obrigatórios (RG, CPF, Renda,
+                                    Residência)</li>
+                                <li><i class="fas fa-users"></i> Se houver cônjuge ou associados, incluir a documentação
+                                    deles também</li>
+                                <li><i class="fas fa-arrow-right"></i> Mover para "Aguardando Correspondente" após
+                                    conferência completa</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Aguardando Correspondente -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon analise">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h3>Aguardando Correspondente</h3>
+                        </div>
+                        <p class="status-description">
+                            Ponto de transferência de custódia: o cadastro fica bloqueado e aguarda análise técnica do
+                            CCA.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente Bancário (CCA)</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-lock"></i> <span><strong>Corretor/Imobiliária:</strong>
+                                        Visualização apenas</span></li>
+                                <li><i class="fas fa-user-check"></i> <span><strong>Empresa correspondente:</strong>
+                                        Associa analista e inicia análise técnica</span></li>
+                                <li><i class="fas fa-forward"></i> <span><strong>CCA:</strong> Move para próximas etapas
+                                        de análise</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Análise Documental -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon analise">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Análise Documental</h3>
+                        </div>
+                        <p class="status-description">
+                            Verificação técnica de autenticidade, legibilidade e completude dos documentos enviados. Uso
+                            de IA (CV Magic) para validação automática.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente Bancário (CCA)</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-file-medical-alt"></i> Validar documentos com CV Magic</li>
+                                <li><i class="fas fa-exclamation-triangle"></i> Identificar pendências ou documentos
+                                    ilegíveis</li>
+                                <li><i class="fas fa-reply"></i> Enviar para "Pendência Documental" se necessário</li>
+                                <li><i class="fas fa-forward"></i> Avançar para análises específicas (SICAQ, Agência,
+                                    Renda)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Análise SICAQ -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon analise">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <h3>Análise SICAQ</h3>
+                        </div>
+                        <p class="status-description">
+                            Verificação de enquadramento em subsídios governamentais (Minha Casa Minha Vida), teto de
+                            financiamento e taxas aplicáveis via Sistema Caixa Aqui.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente Bancário (CCA)</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-calculator"></i> Verificar enquadramento em programas habitacionais
+                                </li>
+                                <li><i class="fas fa-percent"></i> Definir taxas de juros aplicáveis</li>
+                                <li><i class="fas fa-money-bill-wave"></i> Calcular subsídios disponíveis</li>
+                                <li><i class="fas fa-user-plus"></i> Validar Fator Social (dependentes)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Aguardando Agência -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon analise">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h3>Aguardando Agência</h3>
+                        </div>
+                        <p class="status-description">
+                            Interação com a instituição financeira. Aguarda retorno da agência bancária sobre consultas
+                            e validações específicas.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente Bancário (CCA)</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-phone"></i> Interagir com agência bancária</li>
+                                <li><i class="fas fa-hourglass-half"></i> Acompanhar status de solicitações</li>
+                                <li><i class="fas fa-sync"></i> Atualizar informações conforme retorno da agência</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Validação de Renda -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon analise">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <h3>Validação de Renda</h3>
+                        </div>
+                        <p class="status-description">
+                            Consolidação e validação de rendimentos formais e informais. Cálculo do percentual de
+                            comprometimento de renda do titular e associados.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente Bancário (CCA)</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-money-check-alt"></i> Validar contracheques e declarações</li>
+                                <li><i class="fas fa-credit-card"></i> Analisar extratos bancários</li>
+                                <li><i class="fas fa-calculator"></i> Calcular comprometimento de renda</li>
+                                <li><i class="fas fa-balance-scale"></i> Avaliar capacidade de pagamento</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Pendência Documental -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon pendencia">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <h3>Pendência Documental</h3>
+                        </div>
+                        <p class="status-description">
+                            Identificado problema em documento ou falta de informação crucial. O cadastro é
+                            temporariamente liberado e encaminhado para correção.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Corretor / Imobiliária / Gestor</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-file-upload"></i> Anexar documentos corrigidos ou faltantes</li>
+                                <li><i class="fas fa-edit"></i> Editar informações incorretas</li>
+                                <li><i class="fas fa-undo"></i> <span><strong>OBRIGATÓRIO:</strong> Retornar para
+                                        "Aguardando Correspondente"</span></li>
+                                <li><i class="fas fa-bell"></i> Responder rapidamente ao alerta de pendência</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Aprovado -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon aprovado">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <h3>Aprovado</h3>
+                        </div>
+                        <p class="status-description">
+                            Crédito validado sem ressalvas. Cliente possui condições financeiras confirmadas para
+                            aquisição do imóvel.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Corretor / Imobiliária / Gestor</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-bookmark"></i> <strong>Botão liberado:</strong> Iniciar Reserva
+                                </li>
+                                <li><i class="fas fa-handshake"></i> Avançar para etapa de fechamento</li>
+                                <li><i class="fas fa-file-contract"></i> Preparar documentação de venda</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Condicionado -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon aprovado">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <h3>Condicionado</h3>
+                        </div>
+                        <p class="status-description">
+                            Aprovado sob condição específica (pagamento de dívida, ajuste de entrada, fiador, etc.).
+                            Pode prosseguir com ressalvas.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Corretor / Imobiliária / Gestor</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-bookmark"></i> <strong>Botão liberado:</strong> Iniciar Reserva
+                                </li>
+                                <li><i class="fas fa-list-check"></i> Verificar condições impostas pelo CCA</li>
+                                <li><i class="fas fa-user-clock"></i> Acompanhar cumprimento das exigências</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Restrição -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon reprovado">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <h3>Restrição</h3>
+                        </div>
+                        <p class="status-description">
+                            Cliente possui restrições graves em órgãos de proteção ao crédito (Serasa, SPC). Análise
+                            detalhada de Score disponível no sistema.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente (CCA) - Definição</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-eye"></i> Visualizar motivo da restrição</li>
+                                <li><i class="fas fa-chart-pie"></i> Analisar dados do Serasa (Score, histórico)</li>
+                                <li><i class="fas fa-clipboard-list"></i> Registrar causa no funil de vendas</li>
+                                <li><i class="fas fa-phone"></i> Orientar cliente sobre regularização</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Reprovado -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon reprovado">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <h3>Reprovado</h3>
+                        </div>
+                        <p class="status-description">
+                            Renda insuficiente ou incompatibilidade financeira com o empreendimento desejado. Não há
+                            viabilidade para o financiamento.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Correspondente (CCA) - Definição</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-eye"></i> Visualizar motivo da reprovação</li>
+                                <li><i class="fas fa-chart-line"></i> Analisar comprometimento de renda</li>
+                                <li><i class="fas fa-history"></i> Consultar histórico completo</li>
+                                <li><i class="fas fa-home"></i> Sugerir empreendimento alternativo compatível</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Pasta Cancelada -->
+                    <div class="status-card">
+                        <div class="status-header">
+                            <div class="status-icon reprovado">
+                                <i class="fas fa-folder-minus"></i>
+                            </div>
+                            <h3>Pasta Cancelada</h3>
+                        </div>
+                        <p class="status-description">
+                            Processo encerrado por desistência do cliente ou inviabilidade externa. Histórico preservado
+                            para auditoria e BI.
+                        </p>
+                        <div class="status-responsible">
+                            <strong><i class="fas fa-user"></i> Responsável:</strong>
+                            <span>Qualquer perfil pode cancelar</span>
+                        </div>
+                        <div class="status-actions">
+                            <h4><i class="fas fa-check-circle"></i> Ações Permitidas:</h4>
+                            <ul class="actions-list">
+                                <li><i class="fas fa-times"></i> Encerrar processo a qualquer momento</li>
+                                <li><i class="fas fa-file-alt"></i> Registrar motivo do cancelamento</li>
+                                <li><i class="fas fa-archive"></i> Manter histórico para análise futura</li>
+                                <li><i class="fas fa-chart-area"></i> Alimentar dados de BI e perdas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Seção: Matriz de Permissões -->
+        <div id="matriz" class="tab-content">
+            <section>
+                <div class="section-header">
+                    <h2><i class="fas fa-table"></i> Matriz de Permissões por Perfil</h2>
+                    <p>Tabela completa de atribuições e controles de acesso em cada status do workflow</p>
+                </div>
+                <div class="matrix-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Corretor / Imobiliária</th>
+                                <th>Gestor</th>
+                                <th>Correspondente (CCA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nova Avaliação</td>
+                                <td><span class="permission-badge full">Criar e Editar Completo</span></td>
+                                <td><span class="permission-badge full">Supervisão e Edição</span></td>
+                                <td><span class="permission-badge view">Visualização Apenas</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aguardando Correspondente</td>
+                                <td><span class="permission-badge view">Visualização de Status</span></td>
+                                <td><span class="permission-badge view">Visualização de Status</span></td>
+                                <td><span class="permission-badge full">Associa CCA e Inicia Análise</span></td>
+                            </tr>
+                            <tr>
+                                <td>Análise Documental</td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge full">Edição Total de Crédito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Análise SICAQ</td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge full">Edição Total de Crédito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aguardando Agência</td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge full">Edição Total de Crédito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Validação de Renda</td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge blocked">Bloqueado para Edição</span></td>
+                                <td><span class="permission-badge full">Edição Total de Crédito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Pendência Documental</td>
+                                <td><span class="permission-badge action">Ação: Sanar Pendência</span></td>
+                                <td><span class="permission-badge action">Pode Intervir para Ajudar</span></td>
+                                <td><span class="permission-badge view">Visualização de Retorno</span></td>
+                            </tr>
+                            <tr>
+                                <td>Aprovado / Condicionado</td>
+                                <td><span class="permission-badge action">Ação: Iniciar Reserva</span></td>
+                                <td><span class="permission-badge full">Gestão de Unidades</span></td>
+                                <td><span class="permission-badge view">Visualização de Resultado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Restrição / Reprovado</td>
+                                <td><span class="permission-badge view">Visualização de Motivo</span></td>
+                                <td><span class="permission-badge full">Análise de Funil e Perdas</span></td>
+                                <td><span class="permission-badge full">Definição de Veredito</span></td>
+                            </tr>
+                            <tr>
+                                <td>Em Reserva</td>
+                                <td><span class="permission-badge full">Gestão da Venda</span></td>
+                                <td><span class="permission-badge full">Aprovação de Contrato</span></td>
+                                <td><span class="permission-badge action">Apoio no Repasse Bancário</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Seção: FAQ -->
+        <div id="faq" class="tab-content">
+            <section>
+                <div class="faq-container">
+                    <div class="faq-header">
+                        <h2><i class="fas fa-lightbulb"></i> FAQ - Dicas de Ouro e Regras Críticas</h2>
+                    </div>
+                    <div class="faq-grid">
+                        <div class="faq-item">
+                            <h3><i class="fas fa-users"></i> Documentos do Cônjuge são Obrigatórios?</h3>
+                            <p>
+                                <strong>Sim!</strong> Se o cliente é casado, a documentação completa do cônjuge é
+                                <strong>OBRIGATÓRIA</strong>
+                                ainda na fase "Nova Avaliação". Anexar os documentos sob a categoria "Cônjuge".
+                                A falta desses dados pode causar reprovação ou atraso significativo na análise de
+                                crédito.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-undo"></i> O que fazer após corrigir uma Pendência Documental?</h3>
+                            <p>
+                                Após sanar uma Pendência Documental, você <strong>DEVE OBRIGATORIAMENTE</strong> alterar
+                                o status de volta para
+                                "Aguardando Correspondente". Se apenas anexar o arquivo sem mudar o status, a pasta
+                                continuará na fila de pendências do CCA, gerando atrasos desnecessários no processo.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-lock"></i> Por que o cadastro fica "congelado" após o envio?</h3>
+                            <p>
+                                "Nova Avaliação" é o <strong>ÚNICO</strong> status onde o corretor pode editar
+                                livremente os dados do cliente.
+                                Uma vez que a pasta vai para "Aguardando Correspondente", o cadastro fica "congelado"
+                                para evitar alterações durante a análise técnica do CCA. Por isso, confira TUDO antes de
+                                enviar!
+                            </p>
+                        </div>
+
+                        <!--<div class="faq-item">
+                            <h3><i class="fas fa-baby"></i> O que é Fator Social e como ele ajuda?</h3>
+                            <p>
+                                Para famílias de baixa renda, preencher o "Fator Social" incluindo até 4 dependentes
+                                (filhos, pais, etc.) é fundamental. Esses dados <strong>aumentam os subsídios
+                                    habitacionais</strong>
+                                disponíveis e podem viabilizar aprovações que seriam negadas por falta de renda
+                                suficiente.
+                            </p>
+                        </div>-->
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-history"></i> Como funciona o sistema de Auditoria?</h3>
+                            <p>
+                                Toda alteração fica registrada no menu "Histórico" com data, hora, usuário e painel de
+                                origem.
+                                Modificações em campos críticos (renda, crédito) após aprovação do CCA podem exigir nova
+                                análise completa.
+                                Transparência total = responsabilidade compartilhada entre todos os perfis.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-robot"></i> Como usar o CV Magic para validação?</h3>
+                            <p>
+                                O CV Magic usa Inteligência Artificial para converter documentos (imagens e PDFs) em
+                                texto e comparar
+                                automaticamente com os dados cadastrados no sistema. Essa ferramenta acelera
+                                significativamente a
+                                "Análise Documental" e previne erros de digitação e possíveis fraudes.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-check-double"></i> Checklist antes de enviar para o CCA</h3>
+                            <p>
+                                Antes de mover de "Nova Avaliação" para "Aguardando Correspondente", confira:
+                                ✓ Documentos em 100% (titular e cônjuge),
+                                ✓ Dados completos e corretos,
+                                ✓ Renda declarada com precisão,
+                                ✓ Fator Social preenchido quando aplicável.
+                                Quanto melhor a qualidade na entrada, mais rápida será a aprovação!
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-shield-alt"></i> Por que respeitar as "baias" de cada perfil?</h3>
+                            <p>
+                                Cada perfil tem seu "território" específico no workflow para garantir eficiência e
+                                segurança.
+                                Corretor detém Nova Avaliação e Pendências. CCA detém todas as Análises Técnicas.
+                                Gestor detém o controle global e visibilidade total. Respeitar essa divisão evita
+                                "bagunça",
+                                retrabalho e garante a integridade do processo.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-question-circle"></i> Quem pode cancelar uma pasta?</h3>
+                            <p>
+                                Qualquer perfil envolvido no processo (Corretor, Imobiliária, Gestor ou CCA) tem a
+                                prerrogativa
+                                de cancelar a pasta caso o cliente desista da compra ou o processo se torne inviável por
+                                razões
+                                externas. O cancelamento preserva o histórico completo para auditoria e Business
+                                Intelligence.
+                            </p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h3><i class="fas fa-clock"></i> Qual o tempo médio de cada etapa?</h3>
+                            <p>
+                                O tempo varia conforme a complexidade do caso e qualidade dos documentos enviados.
+                                Em média: Nova Avaliação (1-2 dias), Análises do CCA (3-5 dias úteis), Pendências
+                                (depende da
+                                correção). Pastas com documentação completa e correta desde o início têm aprovação até
+                                70% mais rápida.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                <i class="fas fa-shield-alt"></i>
+                Documentação Técnica CV CRM - Sistema de Workflow de Pré-Cadastro
+            </p>
+
+            <p style="margin-top: 8px; font-size: 0.85em; opacity: 0.85;">
+                Desenvolvido por <strong>Lucas Fonseca</strong> - Analista de Dados - <strong>Sell My House</strong>
+            </p>
+
+            <p style="margin-top: 4px; font-size: 0.75em; opacity: 0.7;">
+                Versão 1.0 - Baseada em documentação oficial e melhores práticas de governança
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Inicializar Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#E3F2FD',
+                primaryTextColor: '#0E4174',
+                primaryBorderColor: '#0E4174',
+                lineColor: '#0E4174',
+                secondaryColor: '#FFF3E0',
+                tertiaryColor: '#E8F5E9'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 50,
+                rankSpacing: 50
+            }
+        });
+
+        // Sistema de Navegação por Abas
+        function switchTab(tabName) {
+            // Esconder todas as seções
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remover classe active de todas as abas
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar seção selecionada
+            document.getElementById(tabName).classList.add('active');
+
+            // Adicionar classe active na aba clicada
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Scroll suave para o topo da página
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Salvar preferência no localStorage
+            localStorage.setItem('activeTab', tabName);
+        }
+
+        // Restaurar aba ativa ao carregar página
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTab = localStorage.getItem('activeTab');
+            if (savedTab) {
+                switchTab(savedTab);
+            }
+
+            // Header shrink on scroll
+            let lastScroll = 0;
+            const header = document.querySelector('header');
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+
+                if (currentScroll > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                lastScroll = currentScroll;
+            });
+
+            // Animações de entrada ao scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Aplicar animações aos cards e itens FAQ
+            document.querySelectorAll('.status-card, .faq-item').forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(item);
+            });
+
+            // Log de boas-vindas
+            console.log('%c🎯 CV CRM Workflow System v2.0', 'color: #0E4174; font-size: 20px; font-weight: bold;');
+            console.log('%cNavegação por abas ativada!', 'color: #EE7D19; font-size: 14px;');
+        });
+
+        // Smooth scroll para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Atalhos de teclado para navegação
+        document.addEventListener('keydown', (e) => {
+            // Alt + 1, 2, 3, 4 para navegar entre abas
+            if (e.altKey) {
+                switch (e.key) {
+                    case '1':
+                        switchTab('fluxograma');
+                        break;
+                    case '2':
+                        switchTab('status');
+                        break;
+                    case '3':
+                        switchTab('matriz');
+                        break;
+                    case '4':
+                        switchTab('faq');
+                        break;
+                }
+            }
+
+            // Easter egg: Ctrl + Shift + I
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                const totalCards = document.querySelectorAll('.status-card').length;
+                const totalFaq = document.querySelectorAll('.faq-item').length;
+                alert(`📊 Estatísticas do Sistema CV CRM:\n\n` +
+                    `✓ ${totalCards} Status no Workflow\n` +
+                    `✓ ${totalFaq} Perguntas Frequentes\n` +
+                    `✓ 4 Seções de Navegação\n` +
+                    `✓ 4 Perfis de Usuário\n` +
+                    `✓ Sistema BPMN/Swimlane\n\n` +
+                    `💡 Dica: Use Alt + 1/2/3/4 para navegar entre abas!`);
+            }
+        });
+
+        // Detectar tamanho de tela e ajustar visualização
+        function checkScreenSize() {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                document.body.classList.add('mobile-view');
+            } else {
+                document.body.classList.remove('mobile-view');
+            }
+        }
+
+        window.addEventListener('resize', checkScreenSize);
+        checkScreenSize();
+    </script>
+</body>
+
+</html>
